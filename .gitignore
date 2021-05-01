@@ -1,2 +1,14 @@
+# Environment Variables
+.env
+
 # Python Virtual Environment
 .venv
+
+# Project Description (should not be made public)
+project-description.md
+
+# Editor Config
+.vscode
+.mypy_cache
+
+
