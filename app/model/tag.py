@@ -1,6 +1,6 @@
 import re
 
-from pydantic import BaseModel, ValidationError, validator # type: ignore
+from pydantic import BaseModel, validator # type: ignore
 
 
 valid_name = re.compile(r"[a-z_]{3,15}", re.I)
