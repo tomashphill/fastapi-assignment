@@ -15,15 +15,14 @@ class MockDB(DB):
 
     async def increment_tag(self, tag_to_increment: TagIncrement) -> Tag:
         match = None
-        for id, tag in self.db.items():
-            if tag["name"] == tag_to_increment.name:
+        for id, tag_d in self.db.items():
+            if tag_d["name"] == tag_to_increment.name: # type: ignore
                 self.db[id]["value"] += tag_to_increment.value
-                tag = Tag.parse_obj(tag)
+                tag = Tag.parse_obj(tag_d)
                 match = True
                 break
 
         if match is None:
-            print("adding")
             id = str(uuid1()) # generate unique id
             tag = tag_to_increment
             self.db[id] = tag_to_increment.dict()

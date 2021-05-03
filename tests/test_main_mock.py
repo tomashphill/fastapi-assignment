@@ -1,52 +1,75 @@
-import logging
-
-from fastapi import FastAPI
 from fastapi.testclient import TestClient # type: ignore
+from pytest_mock import MockerFixture
 
-from .json_db import *
-from app.dependencies import get_db
-from app.routers import tags
-
-
-app = FastAPI()
-app.include_router(tags.router)
-
-mock_db = MockDB()
-def get_mock_db() -> DB:
-    return mock_db
-
-# override database dependency with mock database
-app.dependency_overrides[get_db] = get_mock_db
+from app.main import app
+from app.model.database.db import *
 
 
 client = TestClient(app)
 
-def test_get_tag_empty_db():
+
+def test_get_all_tags_method_empty_db(mocker: MockerFixture):
+    mocker.patch(
+        "app.model.database.firestore.FireStore.get_all_tags",
+        return_value=[]
+    )
+
     response = client.get("/tag")
+
     assert response.status_code == 200
     assert response.json() == {}
 
-def test_increment_tag():
+
+def test_get_tags(mocker: MockerFixture):
+    mocker.patch(
+        "app.model.database.firestore.FireStore.get_all_tags",
+        return_value=[Tag.parse_obj({"name": "ballz", "value": 6})]
+    )
+
+    response = client.get('/tag')
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "ballz": 6
+    }
+
+
+def test_increment_tag(mocker: MockerFixture):
+    mocker.patch(
+        "app.model.database.firestore.FireStore.increment_tag",
+        return_value=Tag.parse_obj({"name": "ballz", "value": 4})
+    )
+
     response = client.post(
         "/tag",
         json={"name": "ballz", "value": 4}
     )
+
     assert response.status_code == 200
     assert response.json() == {"name": "ballz", "value": 4}
 
-def test_increment_existing_tag():
+
+def test_increment_existing_tag(mocker: MockerFixture):
+    mocker.patch(
+        "app.model.database.firestore.FireStore.increment_tag",
+        return_value=Tag.parse_obj({"name": "ballz", "value": 6})
+    )
+
     response = client.post(
         "/tag",
         json={"name": "ballz", "value": 2}
     )
+
     assert response.status_code == 200
     assert response.json() == {"name": "ballz", "value": 6}
+
 
 def test_increment_tag_invalid_name():
     response = client.post(
         "/tag",
         json={"name": "9lives", "value": 2}
     )
+
     assert response.status_code == 422
     assert response.json() == {
         'detail': [{
@@ -62,6 +85,7 @@ def test_increment_tag_invalid_value():
         "/tag",
         json={"name": "ballz", "value": 12}
     )
+
     assert response.status_code == 422
     assert response.json() == {
         'detail': [{
@@ -72,10 +96,4 @@ def test_increment_tag_invalid_value():
         }]
     }
 
-def test_get_tags():
-    response = client.get('/tag')
-    assert response.status_code == 200
-    assert response.json() == {
-        "ballz": 6
-    }
 
