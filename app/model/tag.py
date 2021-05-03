@@ -5,17 +5,12 @@ from pydantic import BaseModel, validator # type: ignore
 
 valid_name = re.compile(r"[a-z_]{3,15}", re.I)
 
-
 class Tag(BaseModel):
-    """
-    """
     name: str
-    value: int = 0
+    value: int
 
 
 class TagIncrement(Tag):
-    """
-    """
     @validator('value')
     def pos_int_less_than_10(cls, v):
         if v <= 0 or v >= 10:

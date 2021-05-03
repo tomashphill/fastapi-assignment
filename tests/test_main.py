@@ -1,10 +1,14 @@
+import logging
+
 from fastapi.testclient import TestClient # type: ignore
 
 from app.application import create_app
 from .mock_db import *
 
 
-app = create_app(title="Tagger Tester", db=MockDB())
+app = create_app(title="Tagger Tester", 
+                 db=MockDB(), 
+                 logger=logging.getLogger())
 
 client = TestClient(app)
 

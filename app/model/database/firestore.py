@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import List
 
@@ -11,10 +12,12 @@ from .db import DB
 
 class FireStore(DB):
     """
+    `FireStore` is a concrete definition of the DB interface.
+    A path to the JSON credentials must me supplied.
     """
     def __init__(self, cred_path: Path):
         if not cred_path.is_file():
-            raise Exception(f"{cred_path} is not a JSON file.")
+            raise Exception(f"{cred_path} is not a file.")
 
         cred = credentials.Certificate(cred_path)
         app = firebase_admin.initialize_app(cred)
@@ -28,7 +31,9 @@ class FireStore(DB):
     
     async def increment_tag(self, tag_to_increment: Tag) -> Tag:
         """
-
+        `increment_tag` will increment the tag `tag_to_increment.name` 
+        by `tag_to_increment.value`. If the tag doesn't exist, a new one
+        will be created and stored in the database with value `tag_to_increment.value`.
         """
         possible_tag = (self.db.collection(u'tags')
                 .where(u'name', u'==', tag_to_increment.name)

@@ -1,0 +1,11 @@
+.venv
+.vscode
+.mypy-cache
+.pytest_cache
+__pycache__
+.git
+.gitignore
+docker-compose.*
+Dockerfile
+*.md
+tests

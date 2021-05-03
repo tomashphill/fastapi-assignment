@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Any, Dict
 from uuid import uuid1
 
 from app.model.database.db import *
@@ -6,7 +6,7 @@ from app.model.database.db import *
 
 class MockDB(DB):
     def __init__(self):
-        self.db: Dict[str, Dict[str, Union[int, str]]]
+        self.db: Dict[str, Dict[str, Any]]
         self.db = {}
 
     async def get_all_tags(self) -> List[Tag]:
